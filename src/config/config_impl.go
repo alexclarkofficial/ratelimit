@@ -17,6 +17,8 @@ type yamlRateLimit struct {
 	RequestsPerUnit uint32 `yaml:"requests_per_unit"`
 	Unit            string
 	Unlimited       bool `yaml:"unlimited"`
+	Name            string
+	Replaces        []string
 }
 
 type yamlDescriptor struct {
