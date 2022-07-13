@@ -29,10 +29,10 @@ func UnitToDivider(unit pb.RateLimitResponse_RateLimit_Unit) int64 {
 	panic("should not get here")
 }
 
-func CalculateReset(unit *pb.RateLimitResponse_RateLimit_Unit, timeSource TimeSource) *duration.Duration {
+func CalculateReset(unit *pb.RateLimitResponse_RateLimit_Unit, unitMultiplier uint32, timeSource TimeSource) *duration.Duration {
 	sec := UnitToDivider(*unit)
 	now := timeSource.UnixNow()
-	return &duration.Duration{Seconds: sec - now%sec}
+	return &duration.Duration{Seconds: sec*int64(unitMultiplier) - now%sec}
 }
 
 func Max(a uint32, b uint32) uint32 {

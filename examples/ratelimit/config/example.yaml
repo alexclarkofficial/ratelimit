@@ -11,7 +11,8 @@ descriptors:
           requests_per_unit: 1
   - key: foo
     rate_limit:
-      unit: minute
+      unit: second
+      unit_multiplier: 15
       requests_per_unit: 2
     descriptors:
       - key: bar

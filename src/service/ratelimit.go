@@ -128,8 +128,9 @@ func (this *service) constructLimitsToCheck(request *pb.RateLimitRequest, ctx co
 					logger.Debugf("descriptor is unlimited, not passing to the cache")
 				} else {
 					logger.Debugf(
-						"applying limit: %d requests per %s, shadow_mode: %t",
+						"applying limit: %d requests per %d %s, shadow_mode: %t",
 						limitsToCheck[i].Limit.RequestsPerUnit,
+						limitsToCheck[i].Limit.UnitMultiplier,
 						limitsToCheck[i].Limit.Unit.String(),
 						limitsToCheck[i].ShadowMode,
 					)
@@ -232,7 +233,7 @@ func (this *service) rateLimitResetHeader(
 
 	return &core.HeaderValue{
 		Key:   this.customHeaderResetHeader,
-		Value: strconv.FormatInt(utils.CalculateReset(&descriptor.CurrentLimit.Unit, this.customHeaderClock).GetSeconds(), 10),
+		Value: strconv.FormatInt(utils.CalculateReset(&descriptor.CurrentLimit.Unit, descriptor.CurrentLimit.UnitMultiplier, this.customHeaderClock).GetSeconds(), 10),
 	}
 }
 

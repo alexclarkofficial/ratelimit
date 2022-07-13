@@ -136,7 +136,7 @@ func TestService(test *testing.T) {
 	request = common.NewRateLimitRequest(
 		"different-domain", [][][2]string{{{"foo", "bar"}}, {{"hello", "world"}}}, 1)
 	limits := []*config.RateLimit{
-		config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
+		config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
 		nil,
 	}
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[0]).Return(limits[0])
@@ -172,7 +172,7 @@ func TestService(test *testing.T) {
 	// Config should still be valid. Also make sure order does not affect results.
 	limits = []*config.RateLimit{
 		nil,
-		config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
+		config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
 	}
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[0]).Return(limits[0])
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[1]).Return(limits[1])
@@ -225,7 +225,7 @@ func TestServiceGlobalShadowMode(test *testing.T) {
 
 	// Global Shadow mode
 	limits := []*config.RateLimit{
-		config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
+		config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
 		nil,
 	}
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[0]).Return(limits[0])
@@ -265,8 +265,8 @@ func TestRuleShadowMode(test *testing.T) {
 	request := common.NewRateLimitRequest(
 		"different-domain", [][][2]string{{{"foo", "bar"}}, {{"hello", "world"}}}, 1)
 	limits := []*config.RateLimit{
-		config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, true),
-		config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, true),
+		config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, true),
+		config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, true),
 	}
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[0]).Return(limits[0])
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[1]).Return(limits[1])
@@ -298,8 +298,8 @@ func TestMixedRuleShadowMode(test *testing.T) {
 	request := common.NewRateLimitRequest(
 		"different-domain", [][][2]string{{{"foo", "bar"}}, {{"hello", "world"}}}, 1)
 	limits := []*config.RateLimit{
-		config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, true),
-		config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
+		config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, true),
+		config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
 	}
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[0]).Return(limits[0])
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[1]).Return(limits[1])
@@ -357,7 +357,7 @@ func TestServiceWithCustomRatelimitHeaders(test *testing.T) {
 	request := common.NewRateLimitRequest(
 		"different-domain", [][][2]string{{{"foo", "bar"}}, {{"hello", "world"}}}, 1)
 	limits := []*config.RateLimit{
-		config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
+		config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
 		nil,
 	}
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[0]).Return(limits[0])
@@ -380,7 +380,7 @@ func TestServiceWithCustomRatelimitHeaders(test *testing.T) {
 			ResponseHeadersToAdd: []*core.HeaderValue{
 				{Key: "A-Ratelimit-Limit", Value: "10"},
 				{Key: "A-Ratelimit-Remaining", Value: "0"},
-				{Key: "A-Ratelimit-Reset", Value: "58"},
+				{Key: "A-Ratelimit-Reset", Value: "298"},
 			},
 		},
 		response)
@@ -409,7 +409,7 @@ func TestServiceWithDefaultRatelimitHeaders(test *testing.T) {
 	request := common.NewRateLimitRequest(
 		"different-domain", [][][2]string{{{"foo", "bar"}}, {{"hello", "world"}}}, 1)
 	limits := []*config.RateLimit{
-		config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
+		config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false),
 		nil,
 	}
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[0]).Return(limits[0])
@@ -432,7 +432,7 @@ func TestServiceWithDefaultRatelimitHeaders(test *testing.T) {
 			ResponseHeadersToAdd: []*core.HeaderValue{
 				{Key: "RateLimit-Limit", Value: "10"},
 				{Key: "RateLimit-Remaining", Value: "0"},
-				{Key: "RateLimit-Reset", Value: "58"},
+				{Key: "RateLimit-Reset", Value: "298"},
 			},
 		},
 		response)
@@ -469,7 +469,7 @@ func TestCacheError(test *testing.T) {
 	service := t.setupBasicService()
 
 	request := common.NewRateLimitRequest("different-domain", [][][2]string{{{"foo", "bar"}}}, 1)
-	limits := []*config.RateLimit{config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false)}
+	limits := []*config.RateLimit{config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("key"), false, false)}
 	t.config.EXPECT().GetLimit(nil, "different-domain", request.Descriptors[0]).Return(limits[0])
 	t.cache.EXPECT().DoLimit(nil, request, limits).Do(
 		func(context.Context, *pb.RateLimitRequest, []*config.RateLimit) {
@@ -513,9 +513,9 @@ func TestUnlimited(test *testing.T) {
 	request := common.NewRateLimitRequest(
 		"some-domain", [][][2]string{{{"foo", "bar"}}, {{"hello", "world"}}, {{"baz", "qux"}}}, 1)
 	limits := []*config.RateLimit{
-		config.NewRateLimit(10, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("foo_bar"), false, false),
+		config.NewRateLimit(10, 5, pb.RateLimitResponse_RateLimit_MINUTE, t.statsManager.NewStats("foo_bar"), false, false),
 		nil,
-		config.NewRateLimit(55, pb.RateLimitResponse_RateLimit_SECOND, t.statsManager.NewStats("baz_qux"), true, false),
+		config.NewRateLimit(55, 5, pb.RateLimitResponse_RateLimit_SECOND, t.statsManager.NewStats("baz_qux"), true, false),
 	}
 	t.config.EXPECT().GetLimit(nil, "some-domain", request.Descriptors[0]).Return(limits[0])
 	t.config.EXPECT().GetLimit(nil, "some-domain", request.Descriptors[1]).Return(limits[1])
